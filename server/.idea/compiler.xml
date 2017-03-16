@@ -10,6 +10,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="redis" target="1.8" />
       <module name="web" target="1.8" />
       <module name="web (1) (com.wotakuc.satellite)" target="1.8" />
     </bytecodeTargetLevel>

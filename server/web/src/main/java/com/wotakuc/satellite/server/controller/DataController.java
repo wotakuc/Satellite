@@ -4,9 +4,12 @@ import com.wotakuc.satellite.server.config.PathConfig;
 import com.wotakuc.satellite.server.config.SAParams;
 import com.wotakuc.satellite.server.data.MapRuler;
 import com.wotakuc.satellite.server.model.SAResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,6 +19,27 @@ import javax.servlet.http.HttpServletRequest;
  */
 @RestController
 public class DataController {
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
+
+    @RequestMapping("/Dev/Set/{appName}/**")
+    public SAResponse setDemoData(@PathVariable String appName, @RequestParam String k,@RequestParam String value, HttpServletRequest request){
+        try{
+            if(!k.equals("113322qq"))
+                throw new Exception("no permission");
+            String pre = "/Dev/Set/";
+            String path =  request.getRequestURI().substring(pre.length() + appName.length());
+            String key = appName + "/" + path;
+            redisTemplate.opsForValue().set(key,value);
+            return new SAResponse(true,value,null);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            return new SAResponse(false,value,e.getMessage());
+        }
+    }
+
+
 
     @RequestMapping(PathConfig.GETDATA)
     public SAResponse getData(@PathVariable String appName, HttpServletRequest request){
@@ -58,6 +82,7 @@ public class DataController {
     }
 
     private String getPathValue(String appName,String path){
-        return "appName is " + appName + "  path is " + path;
+        String value = redisTemplate.opsForValue().get(appName + "/" + path);
+        return value;
     }
 }
