@@ -45,16 +45,23 @@ public class RedisConfig {
         return factory;
     }
 
+//    @Bean
+//    RedisTemplate<String, String> redisTemplate() {
+//        RedisTemplate<String, String> redisTemplate = new RedisTemplate<String, String>();
+//        redisTemplate.setConnectionFactory(jedisConnectionFactory());
+//        return redisTemplate;
+//    }
+
     @Bean
-    RedisTemplate<String, String> redisTemplate() {
-        RedisTemplate<String, String> redisTemplate = new RedisTemplate<String, String>();
-        redisTemplate.setConnectionFactory(jedisConnectionFactory());
-        return redisTemplate;
+    StringRedisTemplate stringRedisTemplate(){
+        StringRedisTemplate stringRedisTemplate = new StringRedisTemplate();
+        stringRedisTemplate.setConnectionFactory(jedisConnectionFactory());
+        return stringRedisTemplate;
     }
 
     @Bean
     RedisCacheManager cacheManager() {
-        RedisCacheManager redisCacheManager = new RedisCacheManager(redisTemplate());
+        RedisCacheManager redisCacheManager = new RedisCacheManager(stringRedisTemplate());
         return redisCacheManager;
     }
 }

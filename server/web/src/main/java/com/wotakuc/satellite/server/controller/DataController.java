@@ -6,6 +6,7 @@ import com.wotakuc.satellite.server.data.MapRuler;
 import com.wotakuc.satellite.server.model.SAResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,13 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 
-/**
- * Created by bl02512 on 2017/3/14.
- */
 @RestController
 public class DataController {
+
     @Autowired
-    private RedisTemplate<String, String> redisTemplate;
+    private StringRedisTemplate template;
 
     @RequestMapping("/Dev/Set/{appName}/**")
     public SAResponse setDemoData(@PathVariable String appName, @RequestParam String k,@RequestParam String value, HttpServletRequest request){
@@ -29,8 +28,8 @@ public class DataController {
                 throw new Exception("no permission");
             String pre = "/Dev/Set/";
             String path =  request.getRequestURI().substring(pre.length() + appName.length());
-            String key = appName + "/" + path;
-            redisTemplate.opsForValue().set(key,value);
+            String key = appName + path;
+            template.opsForValue().set(key,value);
             return new SAResponse(true,value,null);
         }
         catch (Exception e){
@@ -82,7 +81,7 @@ public class DataController {
     }
 
     private String getPathValue(String appName,String path){
-        String value = redisTemplate.opsForValue().get(appName + "/" + path);
+        String value = template.opsForValue().get(appName + path);
         return value;
     }
 }
